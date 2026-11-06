@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keyline Staff Portal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312303a'/><path d='M22 48 50 24l28 24v28H22z' fill='none' stroke='%23d4a24c' stroke-width='7' stroke-linejoin='round'/></svg>">
+<style>
+:root{--ink:#12303a;--ink2:#1d4552;--brass:#b8893b;--brass-l:#d4a24c;--bg:#f4f6f3;--card:#fff;--text:#22343b;--muted:#5d6f75;--line:#d9e0dc;--bad:#b4483c;--ok:#2f7d5b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+h1,h2{color:var(--ink)}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--brass-l);outline-offset:2px}
+.btn{padding:9px 16px;border-radius:7px;border:0;background:var(--brass-l);color:#12303a;font-weight:600;cursor:pointer}
+.btn.sec{background:none;border:1.5px solid var(--line);color:var(--text)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn.del{background:none;border:1.5px solid var(--bad);color:var(--bad)}
+label{display:grid;gap:5px;font-weight:600;font-size:14px;color:var(--ink)}
+input,select{padding:10px 12px;border:1.5px solid var(--line);border-radius:7px;width:100%;background:#fff;color:var(--text)}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:#12303a}
+#login form{background:#fff;padding:32px;border-radius:14px;width:100%;max-width:380px;display:grid;gap:16px}
+#login p.err{color:var(--bad);font-size:14px;min-height:20px}
+#app{display:none;min-height:100vh;grid-template-columns:230px 1fr}
+aside{background:#12303a;color:#d6e3e0;padding:22px 14px;display:flex;flex-direction:column;gap:6px}
+aside .brand{font-weight:800;font-size:19px;color:#fff;padding:0 10px 18px}
+aside button{background:none;border:0;color:inherit;text-align:left;padding:11px 12px;border-radius:8px;cursor:pointer}
+aside button[aria-current=true]{background:var(--ink2);color:#fff}
+aside .who{margin-top:auto;font-size:13px;padding:10px;color:#9db0b2}
+main{padding:30px;overflow-x:auto}
+main h2{font-size:26px;margin-bottom:6px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.stat b{display:block;font-size:30px;color:var(--ink)}
+.stat span{color:var(--muted);font-size:14px}
+.stat.ngo{border-left:5px solid var(--brass-l)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:13px;color:var(--muted);background:#f0f3f0}
+td.act{display:flex;gap:6px}
+.empty{padding:30px;text-align:center;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:10px}
+.tag{padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#e8eeea}
+.tag.good{background:#dcefe6;color:#1f6046}.tag.warn{background:#f6ead2;color:#8a6420}.tag.bad{background:#f5dcd8;color:#8e352b}
+dialog{border:0;border-radius:14px;padding:26px;width:min(480px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,25,30,.55)}
+dialog form{display:grid;gap:14px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+#toast{position:fixed;bottom:20px;right:20px;background:#12303a;color:#fff;padding:12px 18px;border-radius:8px;display:none}
+.menu{display:none}
+@media(max-width:800px){
+ #app{grid-template-columns:1fr}
+ aside{flex-direction:row;flex-wrap:wrap;padding:12px}
+ aside .brand{width:100%;padding-bottom:6px}aside .who{display:none}
+ main{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form id="loginForm">
+    <h1>Keyline Staff Portal</h1>
+    <label>Email<input type="email" id="email" required autocomplete="username" value="admin@keyline.org"></label>
+    <label>Password<input type="password" id="pw" required autocomplete="current-password"></label>
+    <p class="err" id="err" role="alert"></p>
+    <button class="btn" type="submit">Log in</button>
+    <a href="index.html" style="font-size:14px;color:var(--muted)">Back to website</a>
+  </form>
+</div>
+
+<div id="app">
+  <aside id="nav"></aside>
+  <main id="view"></main>
+</div>
+<dialog id="dlg"><form id="dform"></form></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr = n => '₹' + Number(n || 0).toLocaleString('en-IN');
+const today = () => new Date().toISOString().slice(0, 10);
+let token = localStorage.getItem('kl_token'), user = JSON.parse(localStorage.getItem('kl_user') || 'null'), current = 'dashboard';
+
+async function api(path, opt = {}) {
+  const r = await fetch('/api/' + path, {
+    method: opt.method || 'GET',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+    body: opt.body ? JSON.stringify(opt.body) : undefined
+  });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && path !== 'auth/login') { logout(); throw new Error(d.error); }
+  if (!r.ok) throw new Error(d.error || 'Request failed');
+  return d;
+}
+function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2600); }
+
+/* Resource definitions: form fields (key, label, type, options) and table columns */
+const R = {
+  properties: { title: 'Properties', add: 'Add property',
+    f: [['name','Property name'],['address','Address'],['type','Type','select',['Apartment','Villa','Commercial','Community housing']],
+        ['units','Number of units','number'],['rent','Monthly rent (₹)','number'],
+        ['affordable','Part of NGO affordable housing programme','select',['0|No','1|Yes']],['status','Status','select',['Available','Occupied','Maintenance']]],
+    cols: [['name','Name'],['address','Address'],['type','Type'],['units','Units'],['rent','Rent',v=>inr(v)],
+           ['affordable','NGO programme',v=>v==1?'<span class="tag good">Yes</span>':'No'],['status','Status',v=>`<span class="tag">${esc(v)}</span>`]] },
+  tenants: { title: 'Tenants', add: 'Add tenant',
+    f: [['name','Full name'],['phone','Phone'],['email','Email','email'],['property_id','Property','ref:properties'],['unit','Unit number'],
+        ['rent','Monthly rent (₹)','number'],['category','Category','select',['Standard','Beneficiary']],['lease_start','Lease start','date'],['lease_end','Lease end','date']],
+    cols: [['name','Name'],['property_name','Property'],['unit','Unit'],['rent','Rent',v=>inr(v)],
+           ['category','Category',v=>v==='Beneficiary'?'<span class="tag good">NGO beneficiary</span>':'Standard'],['phone','Phone'],['lease_end','Lease ends']] },
+  payments: { title: 'Rent payments', add: 'Record payment',
+    f: [['tenant_id','Tenant','ref:tenants'],['amount','Amount (₹)','number'],['month','Month for','month'],['paid_on','Paid on','date'],['method','Method','select',['UPI','Cash','Bank transfer','Card','Cheque']]],
+    cols: [['tenant_name','Tenant'],['month','Month'],['amount','Amount',v=>inr(v)],['paid_on','Paid on'],['method','Method']] },
+  requests: { title: 'Maintenance requests', add: 'New request',
+    f: [['tenant_id','Tenant','ref:tenants'],['property_id','Property','ref:properties'],['issue','Issue'],
+        ['priority','Priority','select',['Low','Normal','High']],['status','Status','select',['Open','In progress','Resolved']]],
+    cols: [['issue','Issue'],['tenant_name','Tenant'],['property_name','Property'],
+           ['priority','Priority',v=>`<span class="tag ${v==='High'?'bad':''}">${esc(v)}</span>`],
+           ['status','Status',v=>`<span class="tag ${v==='Resolved'?'good':'warn'}">${esc(v)}</span>`],['created_at','Raised']] }
+};
+const pages = { dashboard: 'Dashboard', ...Object.fromEntries(Object.entries(R).map(([k, v]) => [k, v.title])), enquiries: 'Website enquiries' };
+
+function drawNav() {
+  $('#nav').innerHTML = '<div class="brand">Keyline</div>' +
+    Object.entries(pages).map(([k, t]) => `<button data-p="${k}" aria-current="${k === current}">${t}</button>`).join('') +
+    `<div class="who">${esc(user.name)} (${user.role})<br><button data-p="logout" style="padding:6px 0">Log out</button></div>`;
+}
+$('#nav').addEventListener('click', e => {
+  const p = e.target.dataset.p; if (!p) return;
+  p === 'logout' ? logout() : go(p);
+});
+function go(p) { current = p; drawNav(); render(); }
+
+async function render() {
+  const v = $('#view');
+  try {
+    if (current === 'dashboard') return v.innerHTML = await dashboard();
+    if (current === 'enquiries') return v.innerHTML = await enquiries();
+    const cfg = R[current], rows = await api(current);
+    v.innerHTML = `<div class="bar"><h2>${cfg.title}</h2><button class="btn" id="addBtn">${cfg.add}</button></div>` +
+      (rows.length ? `<table><thead><tr>${cfg.cols.map(c => `<th>${c[1]}</th>`).join('')}<th></th></tr></thead><tbody>` +
+        rows.map(r => `<tr>${cfg.cols.map(c => `<td>${c[2] ? c[2](r[c[0]]) : esc(r[c[0]])}</td>`).join('')}
+          <td class="act"><button class="btn sec sm" data-e="${r.id}">Edit</button>${user.role === 'admin' ? `<button class="btn del sm" data-d="${r.id}">Delete</button>` : ''}</td></tr>`).join('') + '</tbody></table>'
+        : `<div class="empty">Nothing here yet. Use “${cfg.add}” to create the first record.</div>`);
+    $('#addBtn').onclick = () => form(cfg, {});
+    v.onclick = async e => {
+      const id = e.target.dataset.e || e.target.dataset.d; if (!id) return;
+      if (e.target.dataset.e) return form(cfg, rows.find(r => r.id == id));
+      if (confirm('Delete this record? This cannot be undone.')) { await api(`${current}/${id}`, { method: 'DELETE' }).catch(x => toast(x.message)); toast('Deleted'); render(); }
+    };
+  } catch (x) { if (x.message) v.innerHTML = `<div class="empty">${esc(x.message)}</div>`; }
+}
+
+async function dashboard() {
+  const s = await api('stats'), pct = s.expectedRent ? Math.round(s.collectedRent / s.expectedRent * 100) : 0;
+  const c = (n, l, cls = '') => `<div class="stat ${cls}"><b>${n}</b><span>${l}</span></div>`;
+  return `<h2>Dashboard</h2><p style="color:var(--muted);margin-bottom:20px">Overview for ${s.month}</p><div class="cards">` +
+    c(s.properties, 'Properties') + c(s.units, 'Total units') + c(s.tenants, 'Tenants') +
+    c(inr(s.collectedRent), `Collected of ${inr(s.expectedRent)} (${pct}%)`) + c(s.unpaidTenants, 'Tenants yet to pay this month') +
+    c(s.openRequests, 'Open maintenance requests') + c(s.leasesEndingSoon, 'Leases ending in 60 days') +
+    c(s.beneficiaryFamilies, 'Families housed with the NGO', 'ngo') + c(s.affordableProperties, 'Affordable housing properties', 'ngo') + '</div>';
+}
+async function enquiries() {
+  const rows = await api('enquiries');
+  return '<h2 style="margin-bottom:20px">Website enquiries</h2>' + (rows.length ?
+    `<table><thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Role</th><th>Message</th></tr></thead><tbody>${rows.map(r =>
+      `<tr><td>${esc(r.created_at)}</td><td>${esc(r.name)}</td><td>${esc(r.email)}</td><td>${esc(r.role)}</td><td style="white-space:normal">${esc(r.message)}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">No enquiries yet. Messages from the website contact form appear here.</div>');
+}
+
+/* Add/edit form built from the field list */
+async function form(cfg, rec) {
+  const refs = {};
+  for (const f of cfg.f) if ((f[2] || '').startsWith('ref:')) refs[f[0]] = await api(f[2].slice(4));
+  const defaults = { month: today().slice(0, 7), paid_on: today(), units: 1, rent: 0 };
+  $('#dform').innerHTML = `<h2>${rec.id ? 'Edit' : cfg.add}</h2>` + cfg.f.map(([k, l, t = 'text', o]) => {
+    const val = rec[k] ?? (rec.id ? '' : defaults[k] ?? '');
+    let input;
+    if (t.startsWith('ref:')) input = `<select name="${k}"><option value="">Select…</option>${refs[k].map(r => `<option value="${r.id}" ${r.id == val ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}</select>`;
+    else if (t === 'select') input = `<select name="${k}">${o.map(x => { const [v, lab] = x.split('|'); return `<option value="${esc(v)}" ${String(val) === v ? 'selected' : ''}>${esc(lab || v)}</option>`; }).join('')}</select>`;
+    else input = `<input name="${k}" type="${t}" value="${esc(val)}" ${t === 'number' ? 'min="0" step="any"' : ''}>`;
+    return `<label>${l}${input}</label>`;
+  }).join('') + '<p id="ferr" style="color:var(--bad)" role="alert"></p><div class="row"><button type="button" class="btn sec" id="cancel">Cancel</button><button class="btn">Save</button></div>';
+  $('#cancel').onclick = () => $('#dlg').close();
+  $('#dform').onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await api(rec.id ? `${current}/${rec.id}` : current, { method: rec.id ? 'PUT' : 'POST', body: Object.fromEntries(new FormData(e.target)) });
+      $('#dlg').close(); toast('Saved'); render();
+    } catch (x) { $('#ferr').textContent = x.message; }
+  };
+  $('#dlg').showModal();
+}
+
+/* Login / logout */
+function show() { $('#login').style.display = token ? 'none' : 'grid'; $('#app').style.display = token ? 'grid' : 'none'; if (token) go('dashboard'); }
+function logout() { token = null; user = null; localStorage.removeItem('kl_token'); localStorage.removeItem('kl_user'); show(); }
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault(); $('#err').textContent = '';
+  try {
+    const d = await api('auth/login', { method: 'POST', body: { email: $('#email').value, password: $('#pw').value } });
+    token = d.token; user = d.user; localStorage.setItem('kl_token', token); localStorage.setItem('kl_user', JSON.stringify(user)); show();
+  } catch (x) { $('#err').textContent = x.message; }
+};
+show();
+</script>
+</body>
+</html>

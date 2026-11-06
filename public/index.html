@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keyline Property Management | Real Estate &amp; Tenant Management System</title>
+<meta name="description" content="Keyline manages residential and commercial properties, rent collection, leases and maintenance for owners and tenants.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2312303a'/><path d='M22 48 50 24l28 24v28H22z' fill='none' stroke='%23d4a24c' stroke-width='7' stroke-linejoin='round'/><circle cx='50' cy='52' r='7' fill='%23d4a24c'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12303a; --ink2:#1d4552; --brass:#b8893b; --brass-l:#d4a24c;
+  --paper:#f4f6f3; --white:#fff; --text:#22343b; --muted:#5d6f75; --line:#d9e0dc;
+  --ok:#2f7d5b; --warn:#b8893b; --late:#b4483c;
+  --bg:var(--paper); --surface:var(--white);
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0e1d23; --surface:#15292f; --text:#e3ebe8; --muted:#9db0b2; --line:#26404a; --ink:#e3ebe8; --ink2:#bcd0cf}
+  .hero,.band,footer,.btn.primary{--ink:#12303a}
+  .logo-mark rect{fill:#d4a24c} .logo-mark path{stroke:#12303a} .logo-mark circle{fill:#12303a}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:'Public Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:16px}
+h1,h2,h3{font-family:'Bricolage Grotesque','Public Sans',sans-serif;line-height:1.12;color:var(--ink)}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+section{padding:84px 0}
+h2{font-size:clamp(28px,4vw,40px);margin-bottom:14px;letter-spacing:-.01em}
+.lead{color:var(--muted);max-width:60ch;margin-bottom:40px}
+:focus-visible{outline:3px solid var(--brass-l);outline-offset:3px}
+
+/* nav */
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;color:var(--ink);letter-spacing:-.01em}
+.logo small{display:block;font:500 11px 'Public Sans';color:var(--muted);letter-spacing:.02em;margin-top:-3px}
+.nav ul{display:flex;gap:26px;list-style:none;align-items:center}
+.nav ul a{text-decoration:none;font-size:15px;font-weight:500;color:var(--text)}
+.nav ul a:hover{color:var(--brass)}
+.menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:600 14px 'Public Sans';color:var(--ink);cursor:pointer}
+.btn{display:inline-block;padding:13px 24px;border-radius:8px;font-weight:600;text-decoration:none;font-size:15px;border:0;cursor:pointer;font-family:inherit;transition:transform .15s,background .15s}
+.btn.primary{background:var(--brass-l);color:#12303a}
+.btn.primary:hover{background:#e0b25f}
+.btn.ghost{border:1.5px solid currentColor;background:none}
+.btn:active{transform:translateY(1px)}
+
+/* hero */
+.hero{background:#12303a;color:#eaf1ee;padding:76px 0 90px;overflow:hidden}
+.hero h1{color:#fff;font-size:clamp(36px,5.6vw,62px);letter-spacing:-.025em;max-width:13ch}
+.hero p.sub{font-size:18px;color:#bcd0cf;max-width:46ch;margin:22px 0 32px}
+.hero .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero .btn.ghost{color:#eaf1ee}
+.panel{background:var(--surface);color:var(--text);border-radius:14px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.panel-head b{font-family:'Bricolage Grotesque';font-size:17px;color:var(--ink)}
+.panel-head span{font-size:13px;color:var(--muted)}
+.collected{font:800 34px 'Bricolage Grotesque';color:var(--ink);margin:4px 0 8px}
+.collected small{font:500 14px 'Public Sans';color:var(--muted)}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:94%;background:var(--ok);border-radius:6px;transform-origin:left;animation:grow 1.4s .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleX(0)}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:12.5px;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:10px 6px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.tag.paid{background:#dcefe6;color:#1f6046}.tag.due{background:#f6ead2;color:#8a6420}.tag.late{background:#f5dcd8;color:#8e352b}
+@media(prefers-color-scheme:dark){.tag.paid{background:#1d4a3a;color:#9be0c1}.tag.due{background:#4a3c1c;color:#f0cf86}.tag.late{background:#4f2722;color:#f3b4ab}}
+
+/* stats band */
+.band{background:var(--brass-l);padding:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:30px 18px;border-right:1px solid rgba(18,48,58,.2);color:#12303a}
+.stat:last-child{border:0}
+.stat b{display:block;font:800 36px 'Bricolage Grotesque';letter-spacing:-.02em}
+.stat span{font-size:14px;font-weight:500}
+
+/* services */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:28px}
+.card svg{width:34px;height:34px;stroke:var(--brass);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:16px}
+.card h3{font-size:20px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:15px}
+
+/* properties */
+.filters{display:flex;gap:10px;margin-bottom:26px;flex-wrap:wrap}
+.chip{padding:8px 18px;border-radius:30px;border:1.5px solid var(--line);background:var(--surface);font:600 14px 'Public Sans';color:var(--text);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink2);border-color:var(--ink2);color:#fff}
+.props{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.prop{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.prop .img{height:160px;display:flex;align-items:flex-end;padding:14px;position:relative}
+.prop .img svg{position:absolute;inset:0;width:100%;height:100%}
+.prop .badge{position:relative;background:#12303a;color:#fff;font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px}
+.prop .body{padding:18px 20px 20px}
+.prop h3{font-size:18px}
+.prop .loc{color:var(--muted);font-size:14px;margin-bottom:12px}
+.prop .meta{display:flex;justify-content:space-between;font-size:14px;border-top:1px solid var(--line);padding-top:12px}
+.prop .meta b{color:var(--ink);font-family:'Bricolage Grotesque';font-size:17px}
+.prop[hidden]{display:none}
+
+/* portal */
+.portal{background:var(--ink2);color:#e6efec}
+.portal h2{color:#fff}.portal .lead{color:#bcd0cf}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.ticks{list-style:none;display:grid;gap:14px}
+.ticks li{padding-left:34px;position:relative}
+.ticks li:before{content:"";position:absolute;left:0;top:4px;width:20px;height:20px;border-radius:50%;background:var(--brass-l)}
+.ticks li:after{content:"";position:absolute;left:7px;top:8px;width:5px;height:9px;border:solid #12303a;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.ticks b{color:#fff}
+
+/* history */
+.timeline{border-left:3px solid var(--brass-l);margin-left:8px;display:grid;gap:30px;padding-left:30px}
+.tl{position:relative}
+.tl:before{content:"";position:absolute;left:-40px;top:6px;width:15px;height:15px;border-radius:50%;background:var(--bg);border:3px solid var(--brass)}
+.tl b{font:800 22px 'Bricolage Grotesque';color:var(--ink)}
+.tl p{color:var(--muted);max-width:62ch}
+
+/* team */
+.team{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.person{text-align:center}
+.avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font:800 28px 'Bricolage Grotesque';color:#fff}
+.person b{display:block;color:var(--ink)}
+.person span{font-size:14px;color:var(--muted)}
+
+/* quotes */
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+blockquote{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:10px;padding:24px;font-size:15px}
+blockquote cite{display:block;margin-top:14px;font-style:normal;font-weight:600;color:var(--ink);font-size:14px}
+blockquote cite span{font-weight:400;color:var(--muted)}
+
+/* contact */
+form{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:28px;display:grid;gap:16px}
+label{font-size:14px;font-weight:600;color:var(--ink);display:grid;gap:6px}
+input,select,textarea{font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brass)}
+.info p{margin-bottom:16px;color:var(--muted)}
+.info b{color:var(--ink);display:block}
+
+footer{background:#12303a;color:#bcd0cf;padding:50px 0 28px;font-size:14px}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;margin-bottom:30px}
+footer .logo{color:#fff}footer .logo small{color:#9db0b2}
+footer h4{color:#fff;margin-bottom:10px;font-size:15px}
+footer a{display:block;text-decoration:none;margin-bottom:6px}footer a:hover{color:var(--brass-l)}
+footer .legal{border-top:1px solid #26404a;padding-top:20px;font-size:13px}
+
+@media(max-width:900px){
+  .hero .grid,.two{grid-template-columns:1fr}
+  .cards,.props,.quotes{grid-template-columns:1fr 1fr}
+  .team{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid rgba(18,48,58,.2)}
+  .menu-btn{display:block}
+  .nav ul{display:none;position:absolute;top:68px;left:0;right:0;background:var(--bg);flex-direction:column;padding:20px;gap:18px;border-bottom:1px solid var(--line)}
+  .nav ul.open{display:flex}
+}
+@media(max-width:600px){
+  section{padding:60px 0}
+  .cards,.props,.quotes,footer .cols{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="Keyline Property Management home">
+      <svg class="logo-mark" width="40" height="40" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#12303a"/><path d="M22 48 50 24l28 24v28H22z" fill="none" stroke="#d4a24c" stroke-width="7" stroke-linejoin="round"/><circle cx="50" cy="52" r="7" fill="#d4a24c"/><path d="M50 59v12" stroke="#d4a24c" stroke-width="6" stroke-linecap="round"/></svg>
+      <span>Keyline<small>Property Management</small></span>
+    </a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="menu">Menu</button>
+    <ul id="menu">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#properties">Properties</a></li>
+      <li><a href="#portal">Tenant portal</a></li>
+      <li><a href="#community">Community housing</a></li>
+      <li><a href="#about">About us</a></li>
+      <li><a href="app.html">Staff login</a></li>
+      <li><a href="#contact" class="btn primary">Get a free quote</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap grid">
+    <div>
+      <h1>Every unit leased. Every rent on time.</h1>
+      <p class="sub">Keyline manages your rental properties and your tenants from one system, so owners earn more and residents get repairs fixed faster.</p>
+      <div class="cta">
+        <a class="btn primary" href="#contact">Book a free property review</a>
+        <a class="btn ghost" href="#properties">See our properties</a>
+      </div>
+    </div>
+    <div class="panel" aria-label="Sample rent dashboard">
+      <div class="panel-head"><b>Maple Court, Block A</b><span>November 2026</span></div>
+      <div class="collected">₹18,42,000 <small>of ₹19,60,000 collected</small></div>
+      <div class="bar"><i></i></div>
+      <table>
+        <tr><th>Unit</th><th>Tenant</th><th>Rent</th><th>Status</th></tr>
+        <tr><td>A-101</td><td>Priya Raman</td><td>₹32,000</td><td><span class="tag paid">Paid</span></td></tr>
+        <tr><td>A-204</td><td>Daniel Fernandes</td><td>₹41,500</td><td><span class="tag paid">Paid</span></td></tr>
+        <tr><td>A-305</td><td>Meera Iyer</td><td>₹36,000</td><td><span class="tag due">Due in 2 days</span></td></tr>
+        <tr><td>A-402</td><td>Rohan Mehta</td><td>₹45,000</td><td><span class="tag late">3 days late</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="band"><div class="wrap stats">
+  <div class="stat"><b>1,280</b><span>Units under management</span></div>
+  <div class="stat"><b>98.4%</b><span>Rent collected on time</span></div>
+  <div class="stat"><b>24 hrs</b><span>Average repair response</span></div>
+  <div class="stat"><b>Since 2008</b><span>Serving owners in South India</span></div>
+</div></div>
+
+<section id="services">
+  <div class="wrap">
+    <h2>Everything a landlord and a tenant needs</h2>
+    <p class="lead">We handle the daily work of renting a property, from finding the right tenant to returning the deposit.</p>
+    <div class="cards">
+      <div class="card"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></svg><h3>Rent collection</h3><p>Online payments by UPI, card or bank transfer, automatic reminders and a monthly statement for owners.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12h6M10 16h6"/></svg><h3>Lease management</h3><p>Digital agreements, renewals and escalation clauses tracked, with alerts 60 days before expiry.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.4-5.5 6.5-5.5s5.9 1.9 6.5 5.5M17 6a3 3 0 0 1 0 6M21.5 20c-.3-2.4-1.6-4-3.5-4.8"/></svg><h3>Tenant screening</h3><p>Identity, employment and rental-history checks so you only lease to reliable tenants.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5.2 5.2L3 18l3 3 6.3-6.3a4 4 0 0 0 5.2-5.2l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><h3>Maintenance requests</h3><p>Tenants log a repair with a photo. Our verified vendors are assigned and the status is updated live.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><h3>Owner reports</h3><p>Income, expenses, occupancy and tax-ready summaries in a dashboard, available whenever you log in.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg><h3>Inspections and compliance</h3><p>Move-in and move-out inspections with photos, plus safety checks that keep you compliant.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="properties" style="background:var(--surface);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <h2>Properties we manage</h2>
+    <p class="lead">A sample of homes and workspaces currently available through Keyline.</p>
+    <div class="filters" role="group" aria-label="Filter properties">
+      <button class="chip" data-f="all" aria-pressed="true">All</button>
+      <button class="chip" data-f="apartment" aria-pressed="false">Apartments</button>
+      <button class="chip" data-f="villa" aria-pressed="false">Villas</button>
+      <button class="chip" data-f="commercial" aria-pressed="false">Commercial</button>
+    </div>
+    <div class="props" id="props"></div>
+  </div>
+</section>
+
+<section class="portal" id="portal">
+  <div class="wrap two">
+    <div>
+      <h2>One portal for owners and tenants</h2>
+      <p class="lead">Log in from any phone or computer. Everyone sees the same up-to-date records, so there are fewer calls and fewer disputes.</p>
+      <ul class="ticks">
+        <li><b>Tenants</b> pay rent, download receipts and raise repair requests.</li>
+        <li><b>Owners</b> track income, occupancy and expenses per property.</li>
+        <li><b>Managers</b> approve vendors, schedule inspections and send notices.</li>
+      </ul>
+    </div>
+    <div class="panel" aria-label="Sample maintenance requests">
+      <div class="panel-head"><b>Open maintenance requests</b><span>Maple Court</span></div>
+      <table>
+        <tr><th>Issue</th><th>Unit</th><th>Status</th></tr>
+        <tr><td>Kitchen tap leaking</td><td>A-204</td><td><span class="tag due">Vendor assigned</span></td></tr>
+        <tr><td>Hall light not working</td><td>B-110</td><td><span class="tag paid">Completed</span></td></tr>
+        <tr><td>Water heater service</td><td>A-305</td><td><span class="tag late">Awaiting parts</span></td></tr>
+        <tr><td>Door lock replacement</td><td>C-021</td><td><span class="tag paid">Completed</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="community" style="background:var(--surface);border-block:1px solid var(--line)">
+  <div class="wrap two">
+    <div>
+      <h2>Housing with a purpose</h2>
+      <p class="lead">Keyline works with Asha Bhavan Trust, a community NGO, to place families in safe, affordable homes. The same system that manages our market rentals also tracks each partner family’s lease, concessional rent and repairs.</p>
+      <ul class="ticks" style="--x:0">
+        <li style="color:var(--text)"><b style="color:var(--ink)">Concessional rents</b> for families referred by the NGO.</li>
+        <li style="color:var(--text)"><b style="color:var(--ink)">Priority repairs</b> so no family waits for a basic fix.</li>
+        <li style="color:var(--text)"><b style="color:var(--ink)">Transparent reporting</b> to the NGO on families housed and rent collected.</li>
+      </ul>
+    </div>
+    <div class="panel" style="box-shadow:none;border:1px solid var(--line)">
+      <div class="panel-head"><b>Asha Nagar Homes</b><span>Partner programme</span></div>
+      <div class="collected">40 <small>homes for partner families</small></div>
+      <p style="color:var(--muted);font-size:14px">Sample programme details. Figures are fictional and shown for demonstration.</p>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap two" style="align-items:start">
+    <div>
+      <h2>Our story</h2>
+      <p class="lead">Keyline began as a two-person office managing eleven flats. Today we look after more than a thousand homes and offices across Tamil Nadu, Karnataka and Kerala.</p>
+      <div class="team" style="grid-template-columns:1fr 1fr">
+        <div class="person"><div class="avatar" style="background:#12303a">AK</div><b>Arjun Krishnan</b><span>Founder and CEO</span></div>
+        <div class="person"><div class="avatar" style="background:#b8893b">SN</div><b>Sneha Nair</b><span>Head of Operations</span></div>
+        <div class="person"><div class="avatar" style="background:#2f7d5b">VR</div><b>Vikram Rao</b><span>Chief Financial Officer</span></div>
+        <div class="person"><div class="avatar" style="background:#1d4552">LT</div><b>Lakshmi Thomas</b><span>Head of Tenant Care</span></div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl"><b>2008</b><p>Arjun Krishnan opens Keyline in Coimbatore and manages his first 11 apartments.</p></div>
+      <div class="tl"><b>2013</b><p>Reaches 200 units and launches in-house maintenance teams.</p></div>
+      <div class="tl"><b>2018</b><p>Releases the Keyline online portal with digital leases and UPI rent payments.</p></div>
+      <div class="tl"><b>2022</b><p>Expands to Bengaluru and Kochi, and begins managing commercial offices.</p></div>
+      <div class="tl"><b>2026</b><p>Crosses 1,280 managed units and 4,500 active tenants.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--surface);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <h2>What our clients say</h2>
+    <p class="lead">Owners and tenants on working with Keyline.</p>
+    <div class="quotes">
+      <blockquote>Rent used to arrive whenever my tenants remembered. Now it lands on the 1st and I get a report without asking.<cite>Dr. Ramesh Subramanian <span>· Owner, 6 apartments</span></cite></blockquote>
+      <blockquote>I uploaded a photo of a leak at night and a plumber was at my door the next morning.<cite>Ananya Pillai <span>· Tenant, Maple Court</span></cite></blockquote>
+      <blockquote>They screened tenants for our office floor and handled the whole lease renewal. We never had to chase anyone.<cite>Faisal Ahmed <span>· Director, Brightwave Studios</span></cite></blockquote>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap two" style="align-items:start">
+    <div class="info">
+      <h2>Talk to our team</h2>
+      <p class="lead">Tell us about your property and we will send a management proposal within one working day.</p>
+      <p><b>Head office</b>214 Race Course Road, Coimbatore, Tamil Nadu 641018</p>
+      <p><b>Phone</b>+91 422 555 0142</p>
+      <p><b>Email</b>hello@keylinepm.example</p>
+      <p><b>Hours</b>Monday to Saturday, 9:00 am to 6:00 pm</p>
+    </div>
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="contact">
+      <p hidden><label>Do not fill this out: <input name="bot-field"></label></p>
+      <label>Full name<input name="name" required autocomplete="name"></label>
+      <label>Email<input type="email" name="email" required autocomplete="email"></label>
+      <label>I am a<select name="role"><option>Property owner</option><option>Tenant</option><option>Investor</option></select></label>
+      <label>How can we help?<textarea name="message" rows="4"></textarea></label>
+      <button class="btn primary" type="submit">Send message</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="logo" href="#top"><svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#d4a24c"/><path d="M22 48 50 24l28 24v28H22z" fill="none" stroke="#12303a" stroke-width="7" stroke-linejoin="round"/><circle cx="50" cy="52" r="7" fill="#12303a"/><path d="M50 59v12" stroke="#12303a" stroke-width="6" stroke-linecap="round"/></svg><span>Keyline<small>Property Management</small></span></a>
+        <p style="margin-top:14px;max-width:34ch">Property and tenant management for owners across South India since 2008.</p>
+      </div>
+      <div><h4>Company</h4><a href="#about">About us</a><a href="#properties">Properties</a><a href="#contact">Contact</a></div>
+      <div><h4>Services</h4><a href="#services">Rent collection</a><a href="#services">Lease management</a><a href="#portal">Tenant portal</a></div>
+    </div>
+    <div class="legal">© 2026 Keyline Property Management Pvt. Ltd. All rights reserved. All names, figures and properties on this site are fictional samples.</div>
+  </div>
+</footer>
+
+<script>
+const data=[
+ {n:"Maple Court, 3 BHK",l:"RS Puram, Coimbatore",t:"apartment",p:"₹38,000",s:"1,650 sq ft",b:"For rent",c:["#1d4552","#2f7d5b"]},
+ {n:"Lakeview Residency, 2 BHK",l:"Whitefield, Bengaluru",t:"apartment",p:"₹32,000",s:"1,180 sq ft",b:"For rent",c:["#12303a","#b8893b"]},
+ {n:"Palm Grove Villa",l:"Saravanampatti, Coimbatore",t:"villa",p:"₹85,000",s:"3,200 sq ft",b:"For rent",c:["#2f7d5b","#12303a"]},
+ {n:"Backwater Heights, 3 BHK",l:"Marine Drive, Kochi",t:"apartment",p:"₹46,000",s:"1,720 sq ft",b:"Available soon",c:["#b8893b","#1d4552"]},
+ {n:"Orchid Villa, 4 BHK",l:"Koramangala, Bengaluru",t:"villa",p:"₹1,20,000",s:"4,100 sq ft",b:"For rent",c:["#1d4552","#b8893b"]},
+ {n:"Trident Business Park, Floor 4",l:"Avinashi Road, Coimbatore",t:"commercial",p:"₹1,60,000",s:"3,500 sq ft",b:"Office space",c:["#12303a","#2f7d5b"]}
+];
+const box=document.getElementById('props');
+box.innerHTML=data.map((d,i)=>`<article class="prop" data-t="${d.t}">
+ <div class="img" style="background:linear-gradient(135deg,${d.c[0]},${d.c[1]})">
+  <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g fill="rgba(255,255,255,.14)"><rect x="40" y="70" width="60" height="90"/><rect x="110" y="40" width="70" height="120"/><rect x="190" y="85" width="60" height="75"/></g><g fill="rgba(255,255,255,.28)"><rect x="52" y="85" width="12" height="12"/><rect x="76" y="85" width="12" height="12"/><rect x="124" y="58" width="12" height="12"/><rect x="152" y="58" width="12" height="12"/><rect x="124" y="86" width="12" height="12"/><rect x="204" y="100" width="12" height="12"/></g></svg>
+  <span class="badge">${d.b}</span></div>
+ <div class="body"><h3>${d.n}</h3><div class="loc">${d.l}</div>
+ <div class="meta"><span>${d.s}</span><span><b>${d.p}</b> /month</span></div></div></article>`).join('');
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+ document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));
+ const f=c.dataset.f;
+ box.querySelectorAll('.prop').forEach(p=>p.hidden=!(f==='all'||p.dataset.t===f));
+}));
+const mb=document.querySelector('.menu-btn'),menu=document.getElementById('menu');
+mb.addEventListener('click',()=>{const o=menu.classList.toggle('open');mb.setAttribute('aria-expanded',o)});
+menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menu.classList.remove('open');mb.setAttribute('aria-expanded',false)}));
+
+const cf=document.querySelector('form[name=contact]');
+cf.addEventListener('submit',async e=>{e.preventDefault();
+ try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(cf)))});
+  if(!r.ok)throw 0;cf.innerHTML='<p><b>Thank you.</b> We will reply within one working day.</p>';}
+ catch{cf.submit();}});
+</script>
+</body>
+</html>
